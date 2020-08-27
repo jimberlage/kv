@@ -8,4 +8,5 @@ edition = "2018"
 
 [dependencies]
 actix = "0"
+actix-rt = "1"
 clap = "2"

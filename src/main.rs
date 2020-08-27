@@ -3,10 +3,13 @@ extern crate clap;
 
 mod set;
 
-use actix::System;
+use actix::Actor;
 use clap::App;
 
-fn main() {
+use set::SetServer;
+
+#[actix_rt::main]
+async fn main() {
     let matches = App::new("kv")
         .version("1.0")
         .author("Jim Berlage <james.berlage@gmail.com>")
@@ -54,5 +57,5 @@ fn main() {
                     .about("Get the length of the vector")))
         .get_matches();
 
-    System::new("kv_app").run();
+    let set_server = SetServer::new().start();
 }
