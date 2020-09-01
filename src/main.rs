@@ -1,12 +1,15 @@
 extern crate actix;
 extern crate clap;
+extern crate zmq;
 
+mod messenger;
 mod set;
 
 use actix::Actor;
 use clap::App;
 
-use set::SetServer;
+use messenger::MessengerServer;
+use set::SetAgent;
 
 #[actix_rt::main]
 async fn main() {
@@ -16,7 +19,7 @@ async fn main() {
         .about("Data structure utilities for the shell")
         .subcommand(
             App::new("set")
-                .about("Modify a map")
+                .about("Modify a set")
                 .subcommand(App::new("json")
                     .about("Return the contents of the set as JSON"))
                 .subcommand(App::new("add")
@@ -57,5 +60,6 @@ async fn main() {
                     .about("Get the length of the vector")))
         .get_matches();
 
-    let set_server = SetServer::new().start();
+    let set_agent = SetAgent::new().start();
+    let messenger_server = MessengerServer::new("localhost", 60054, set_agent).start();
 }

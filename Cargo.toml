@@ -10,3 +10,7 @@ edition = "2018"
 actix = "0"
 actix-rt = "1"
 clap = "2"
+
+[dependencies.zmq]
+version = "0"
+features = ["vendored"]
