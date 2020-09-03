@@ -1,13 +1,17 @@
 extern crate actix;
 extern crate clap;
+extern crate log;
+extern crate simple_logger;
 extern crate zmq;
 
+mod errors;
 mod messenger;
 mod set;
 
 use actix::Actor;
 use clap::App;
 
+use errors::ErrorServer;
 use messenger::MessengerServer;
 use set::SetAgent;
 
@@ -60,6 +64,7 @@ async fn main() {
                     .about("Get the length of the vector")))
         .get_matches();
 
+    let error_server = ErrorServer::new().start();
     let set_agent = SetAgent::new().start();
-    let messenger_server = MessengerServer::new("localhost", 60054, set_agent).start();
+    let messenger_server = MessengerServer::new("localhost", 60054, error_server, set_agent).start();
 }
