@@ -6,20 +6,13 @@ extern crate tokio;
 extern crate zmq;
 
 mod client;
-mod errors;
-mod messenger;
 mod server;
-mod set;
 
-use actix::Actor;
-use clap::{App, Clap};
-
-use errors::ErrorServer;
-use messenger::MessengerServer;
-use set::SetAgent;
+use clap::Clap;
 
 #[derive(Clap)]
 enum Subcommands {
+    Client(client::Opts),
     Server(server::Opts),
 }
 
@@ -38,6 +31,9 @@ async fn main() {
     let opts = Opts::parse();
 
     match opts.subcommand {
+        Subcommands::Client(_opts) => {
+            unimplemented!();
+        }
         Subcommands::Server(opts) => {
             server::start(&opts).await;
         }

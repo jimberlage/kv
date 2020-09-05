@@ -1,8 +1,8 @@
-use actix::{Actor, Addr, Context, Handler, Message, AsyncContext};
+use actix::{Actor, Addr, Context};
 use zmq;
 
-use crate::errors::{ErrorServer, SocketConnectionError, SocketOpenError};
-use crate::set::SetAgent;
+use crate::server::errors::{ErrorServer, SocketConnectionError, SocketOpenError};
+use crate::server::set::SetAgent;
 
 pub struct MessengerServer {
     ctx: zmq::Context,
@@ -29,7 +29,7 @@ impl MessengerServer {
 impl Actor for MessengerServer {
     type Context = Context<Self>;
 
-    fn started(&mut self, ctx: &mut Self::Context) {
+    fn started(&mut self, _ctx: &mut Self::Context) {
         match self.ctx.socket(zmq::SocketType::PUB) {
             Err(error) => self.error_server_addr.do_send(SocketOpenError(error)),
             Ok(socket) => {
@@ -43,19 +43,5 @@ impl Actor for MessengerServer {
                 }
             },
         }
-
-        // ctx.address().do_send(Tick);
     }
 }
-
-// #[derive(Message)]
-// #[rtype(result = "()")]
-// pub struct Tick;
-//
-// impl Handler<Tick> for MessengerServer {
-//     type Result = ();
-//
-//     fn handle(&mut self, _: Tick, ctx: &mut Context<MessengerServer>) {
-//         ctx.address().do_send(Tick);
-//     }
-// }

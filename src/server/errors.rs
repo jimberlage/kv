@@ -1,4 +1,4 @@
-use actix::{Actor, Addr, Context, Handler, Message};
+use actix::{Actor, Context, Handler, Message};
 use log::error;
 use simple_logger::SimpleLogger;
 use zmq;

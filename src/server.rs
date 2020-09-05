@@ -4,9 +4,13 @@ use actix::{Actor, System};
 use clap::Clap;
 use tokio::signal::ctrl_c;
 
-use crate::errors::ErrorServer;
-use crate::messenger::MessengerServer;
-use crate::set::SetAgent;
+use errors::ErrorServer;
+use messenger::MessengerServer;
+use set::SetAgent;
+
+pub mod messenger;
+pub mod set;
+pub mod errors;
 
 #[derive(Clap)]
 pub struct Opts {
