@@ -9,7 +9,8 @@ edition = "2018"
 [dependencies]
 actix = "0"
 actix-rt = "1"
-clap = "2"
+clap = "3.0.0-beta.1"
 log = "0"
 simple_logger = "1"
+tokio = { version = "0", features = ["full"] }
 zmq = { version = "0", features = ["vendored"] }
