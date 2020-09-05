@@ -1,5 +1,4 @@
 /// Starts a persistent server which will give access to the concurrently accessed data structures.
-
 use actix::{Actor, System};
 use clap::Clap;
 use tokio::signal::ctrl_c;
@@ -8,9 +7,9 @@ use errors::ErrorServer;
 use messenger::MessengerServer;
 use set::SetAgent;
 
+pub mod errors;
 pub mod messenger;
 pub mod set;
-pub mod errors;
 
 #[derive(Clap)]
 pub struct Opts {

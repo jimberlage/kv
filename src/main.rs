@@ -17,10 +17,12 @@ enum Subcommands {
 }
 
 #[derive(Clap)]
-#[clap(version = "1.0",
-       author = "Jim Berlage <james.berlage@gmail.com>",
-       name = "kv",
-       about = "Data structure utilities for the shell")]
+#[clap(
+    version = "1.0",
+    author = "Jim Berlage <james.berlage@gmail.com>",
+    name = "kv",
+    about = "Data structure utilities for the shell"
+)]
 struct Opts {
     #[clap(subcommand)]
     subcommand: Subcommands,

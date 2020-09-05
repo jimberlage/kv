@@ -8,7 +8,9 @@ pub struct SetAgent {
 
 impl SetAgent {
     pub fn new() -> SetAgent {
-        SetAgent { data: HashMap::new() }
+        SetAgent {
+            data: HashMap::new(),
+        }
     }
 }
 
@@ -26,17 +28,15 @@ struct Insert {
 impl Handler<Insert> for SetAgent {
     type Result = bool;
 
-    fn handle(&mut self, Insert { name, value, }: Insert, _ctx: &mut Context<Self>) -> Self::Result {
+    fn handle(&mut self, Insert { name, value }: Insert, _ctx: &mut Context<Self>) -> Self::Result {
         match self.data.get_mut(&name) {
             None => {
                 let mut inner = HashSet::new();
                 inner.insert(value);
                 let _ = self.data.insert(name, inner);
                 true
-            },
-            Some(inner) => {
-                inner.insert(value)
             }
+            Some(inner) => inner.insert(value),
         }
     }
 }

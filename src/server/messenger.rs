@@ -14,7 +14,12 @@ pub struct MessengerServer {
 }
 
 impl MessengerServer {
-    pub fn new(host: &str, port: u16, error_server_addr: Addr<ErrorServer>, set_agent_addr: Addr<SetAgent>) -> Self {
+    pub fn new(
+        host: &str,
+        port: u16,
+        error_server_addr: Addr<ErrorServer>,
+        set_agent_addr: Addr<SetAgent>,
+    ) -> Self {
         MessengerServer {
             ctx: zmq::Context::new(),
             host: host.to_owned(),
@@ -34,14 +39,19 @@ impl Actor for MessengerServer {
             Err(error) => self.error_server_addr.do_send(SocketOpenError(error)),
             Ok(socket) => {
                 self.socket = Some(socket);
-                if let Err(error) = self.socket.as_ref().unwrap().connect(&format!("tcp://{}:{}", self.host, self.port)) {
+                if let Err(error) = self
+                    .socket
+                    .as_ref()
+                    .unwrap()
+                    .connect(&format!("tcp://{}:{}", self.host, self.port))
+                {
                     self.error_server_addr.do_send(SocketConnectionError {
                         error,
                         host: self.host.clone(),
                         port: self.port,
                     })
                 }
-            },
+            }
         }
     }
 }
