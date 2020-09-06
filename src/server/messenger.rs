@@ -35,7 +35,7 @@ impl Actor for MessengerServer {
     type Context = Context<Self>;
 
     fn started(&mut self, _ctx: &mut Self::Context) {
-        match self.ctx.socket(zmq::SocketType::PUB) {
+        match self.ctx.socket(zmq::SocketType::ROUTER) {
             Err(error) => self.error_server_addr.do_send(SocketOpenError(error)),
             Ok(socket) => {
                 self.socket = Some(socket);

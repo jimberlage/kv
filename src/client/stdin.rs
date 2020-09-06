@@ -1,13 +1,17 @@
+use std::collections::VecDeque;
 use std::io::{self, Read};
 
 use actix::{Actor, Addr, Context, Handler, Message};
+use actix::prelude::SendError;
 
-use crate::client::messenger::MessengerServer;
+use crate::client::messenger::{Chunk, MessengerServer};
 use crate::client::errors::{ErrorServer, StdinReadError};
 
 pub struct StdinReaderServer {
+    current_chunk: Vec<u8>,
+    current_sep_idx: usize,
     buf: [u8; 5242880],
-    chunks: Vec<Vec<u8>>,
+    chunks: VecDeque<Vec<u8>>,
     error_server_addr: Addr<ErrorServer>,
     messenger_server_addr: Addr<MessengerServer>,
     sep: Vec<u8>,
@@ -16,8 +20,10 @@ pub struct StdinReaderServer {
 impl StdinReaderServer {
     pub fn new(error_server_addr: Addr<ErrorServer>, messenger_server_addr: Addr<MessengerServer>, sep: Vec<u8>) -> StdinReaderServer {
         StdinReaderServer {
+            current_chunk: vec![],
+            current_sep_idx: 0,
             buf: [0; 5242880],
-            chunks: vec![],
+            chunks: VecDeque::new(),
             error_server_addr,
             messenger_server_addr,
             sep,
@@ -26,31 +32,51 @@ impl StdinReaderServer {
 
     fn parse_chunks(&mut self, bytes_read: usize) {
         if self.sep.len() == 0 {
+            for i in 0..bytes_read {
+                self.current_chunk.push(self.buf[i]);
+            }
+
+            self.buf = [0; 5242880];
+
             return
         }
 
-        let mut current_chunk = vec![];
-        let mut current_sep_idx = 0;
         let last_sep_idx = self.sep.len() - 1;
 
         for i in 0..bytes_read {
             let datum = self.buf[i];
-            if datum != self.sep[current_sep_idx] {
-                current_sep_idx = 0;
-                current_chunk.push(datum);
-            } else if current_sep_idx == last_sep_idx {
-                current_sep_idx = 0;
-                if current_chunk.len() > 0 {
-                    self.chunks.push(current_chunk);
-                    current_chunk = vec![];
+            if datum != self.sep[self.current_sep_idx] {
+                self.current_sep_idx = 0;
+                self.current_chunk.push(datum);
+            } else if self.current_sep_idx == last_sep_idx {
+                self.current_sep_idx = 0;
+                if self.current_chunk.len() > 0 {
+                    self.chunks.push_back(self.current_chunk.clone());
+                    self.current_chunk = vec![];
                 }
             } else {
-                current_sep_idx += 1;
+                self.current_sep_idx += 1;
+            }
+        }
+
+        self.buf = [0; 5242880];
+    }
+
+    fn flush_chunks(&mut self) {
+        while let Some(chunk) = self.chunks.pop_front() {
+            match self.messenger_server_addr.try_send(Chunk(chunk)) {
+                Err(SendError::Full(Chunk(chunk))) => {
+                    self.chunks.push_front(chunk);
+                    break;
+                },
+                Err(SendError::Closed(Chunk(chunk))) => {
+                    self.chunks.push_front(chunk);
+                    break;
+                },
+                Ok(()) => (),
             }
         }
     }
-
-    fn flush_chunks(&mut self) {}
 }
 
 impl Actor for StdinReaderServer {

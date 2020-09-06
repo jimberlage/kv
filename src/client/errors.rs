@@ -62,6 +62,29 @@ impl Handler<SocketConnectionError> for ErrorServer {
 
 #[derive(Message)]
 #[rtype(result = "()")]
+pub struct SocketSendError {
+    pub error: zmq::Error,
+    pub host: String,
+    pub port: u16,
+}
+
+impl Handler<SocketSendError> for ErrorServer {
+    type Result = ();
+
+    fn handle(
+        &mut self,
+        SocketSendError { error, host, port }: SocketSendError,
+        _ctx: &mut Context<Self>,
+    ) -> Self::Result {
+        error!(
+            "Could not send a message over the ZeroMQ socket at tcp://{}:{}; got error: {}",
+            host, port, error
+        )
+    }
+}
+
+#[derive(Message)]
+#[rtype(result = "()")]
 pub struct StdinReadError(pub io::Error);
 
 impl Handler<StdinReadError> for ErrorServer {
