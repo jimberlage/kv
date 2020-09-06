@@ -16,7 +16,7 @@ pub struct Opts {
     host: String,
     #[clap(short, long, default_value = "60054")]
     port: u16,
-    #[clap(short, long, default_value = "\n")]
+    #[clap(short, long = "separator", default_value = "\n")]
     sep: String,
 }
 

@@ -1,0 +1,12 @@
+package messages;
+
+message SetAdd {
+  required string name = 1;
+  required bytes data = 2;
+}
+
+message Message {
+  oneof inner {
+    SetAdd set_add = 1;
+  }
+}

@@ -11,6 +11,8 @@ actix = "0"
 actix-rt = "1"
 clap = "3.0.0-beta.1"
 log = "0"
+prost = "0"
+prost-types = "0"
 simple_logger = "1"
 tokio = { version = "0", features = ["full"] }
 zmq = { version = "0", features = ["vendored"] }
