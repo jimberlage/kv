@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use actix::{Actor, Context, Handler, Message};
 
 pub struct SetAgent {
-    data: HashMap<String, HashSet<String>>,
+    data: HashMap<String, HashSet<Vec<u8>>>,
 }
 
 impl SetAgent {
@@ -20,9 +20,9 @@ impl Actor for SetAgent {
 
 #[derive(Message)]
 #[rtype(result = "bool")]
-struct Insert {
-    name: String,
-    value: String,
+pub struct Insert {
+    pub name: String,
+    pub value: Vec<u8>,
 }
 
 impl Handler<Insert> for SetAgent {

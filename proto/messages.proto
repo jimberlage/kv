@@ -2,13 +2,13 @@ syntax = "proto3";
 
 package messages;
 
-message SetAdd {
+message SetInsert {
   string name = 1;
-  bytes data = 2;
+  bytes value = 2;
 }
 
 message WireMessage {
   oneof inner {
-    SetAdd set_add = 1;
+    SetInsert set_insert = 1;
   }
 }

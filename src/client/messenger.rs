@@ -53,24 +53,24 @@ impl Actor for MessengerServer {
     }
 }
 
-pub enum SetAddError {
+pub enum SetInsertError {
     Retry,
     Unexpected,
 }
 
 #[derive(actix::Message)]
-#[rtype(result = "Result<(), SetAddError>")]
-pub struct SetAdd {
+#[rtype(result = "Result<(), SetInsertError>")]
+pub struct SetInsert {
     pub name: String,
-    pub data: Vec<u8>,
+    pub value: Vec<u8>,
 }
 
-impl SetAdd {
+impl SetInsert {
     fn encode(self) -> Vec<u8> {
         let message = m::WireMessage {
-            inner: Some(m::wire_message::Inner::SetAdd(m::SetAdd {
+            inner: Some(m::wire_message::Inner::SetInsert(m::SetInsert {
                 name: self.name,
-                data: self.data,
+                value: self.value,
             })),
         };
 
@@ -81,19 +81,24 @@ impl SetAdd {
     }
 }
 
-impl Handler<SetAdd> for MessengerServer {
-    type Result = Result<(), SetAddError>;
+impl Handler<SetInsert> for MessengerServer {
+    type Result = Result<(), SetInsertError>;
 
-    fn handle(&mut self, set_add: SetAdd, _ctx: &mut Context<Self>) -> Self::Result {
-        match self.socket.as_ref().unwrap().send(set_add.encode(), zmq::DONTWAIT) {
-            Err(zmq::Error::EAGAIN) => Err(SetAddError::Retry),
+    fn handle(&mut self, set_add: SetInsert, _ctx: &mut Context<Self>) -> Self::Result {
+        match self
+            .socket
+            .as_ref()
+            .unwrap()
+            .send(set_add.encode(), zmq::DONTWAIT)
+        {
+            Err(zmq::Error::EAGAIN) => Err(SetInsertError::Retry),
             Err(error) => {
                 self.error_server_addr.do_send(SocketSendError {
                     error,
                     host: self.host.clone(),
                     port: self.port,
                 });
-                Err(SetAddError::Unexpected)
+                Err(SetInsertError::Unexpected)
             }
             _ => Ok(()),
         }

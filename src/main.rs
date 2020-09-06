@@ -1,6 +1,10 @@
 extern crate actix;
+extern crate actix_rt;
+extern crate base64;
 extern crate clap;
 extern crate log;
+extern crate prost;
+extern crate prost_types;
 extern crate simple_logger;
 extern crate tokio;
 extern crate zmq;

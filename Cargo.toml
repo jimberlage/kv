@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 actix = "0"
 actix-rt = "1"
+base64 = "0"
 clap = "3.0.0-beta.1"
 log = "0"
 prost = "0"

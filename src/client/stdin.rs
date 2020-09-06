@@ -5,7 +5,7 @@ use actix::prelude::SendError;
 use actix::{Actor, Addr, Context, Handler, Message};
 
 use crate::client::errors::{ErrorServer, StdinReadError};
-use crate::client::messenger::{MessengerServer, SetAdd};
+use crate::client::messenger::{MessengerServer, SetInsert};
 
 pub struct StdinReaderServer {
     current_chunk: Vec<u8>,
@@ -71,13 +71,16 @@ impl StdinReaderServer {
 
     fn flush_chunks(&mut self) {
         while let Some(chunk) = self.chunks.pop_front() {
-            match self.messenger_server_addr.try_send(SetAdd { name: self.name.clone(), data: chunk }) {
-                Err(SendError::Full(SetAdd { name: _, data })) => {
-                    self.chunks.push_front(data);
+            match self.messenger_server_addr.try_send(SetInsert {
+                name: self.name.clone(),
+                value: chunk,
+            }) {
+                Err(SendError::Full(SetInsert { name: _, value })) => {
+                    self.chunks.push_front(value);
                     break;
                 }
-                Err(SendError::Closed(SetAdd { name: _, data })) => {
-                    self.chunks.push_front(data);
+                Err(SendError::Closed(SetInsert { name: _, value })) => {
+                    self.chunks.push_front(value);
                     break;
                 }
                 Ok(()) => (),

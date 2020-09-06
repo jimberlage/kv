@@ -778,6 +778,7 @@ version = "0.1.0"
 dependencies = [
  "actix",
  "actix-rt",
+ "base64",
  "clap",
  "log",
  "prost",
