@@ -12,11 +12,7 @@ pub struct MessengerServer {
 }
 
 impl MessengerServer {
-    pub fn new(
-        host: &str,
-        port: u16,
-        error_server_addr: Addr<ErrorServer>,
-    ) -> Self {
+    pub fn new(host: &str, port: u16, error_server_addr: Addr<ErrorServer>) -> Self {
         MessengerServer {
             ctx: zmq::Context::new(),
             host: host.to_owned(),
@@ -77,7 +73,7 @@ impl Handler<Chunk> for MessengerServer {
                     port: self.port,
                 });
                 Err(ChunkError::Unexpected)
-            },
+            }
             _ => Ok(()),
         }
     }

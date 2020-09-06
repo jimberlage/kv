@@ -1,11 +1,11 @@
 use std::collections::VecDeque;
 use std::io::{self, Read};
 
-use actix::{Actor, Addr, Context, Handler, Message};
 use actix::prelude::SendError;
+use actix::{Actor, Addr, Context, Handler, Message};
 
-use crate::client::messenger::{Chunk, MessengerServer};
 use crate::client::errors::{ErrorServer, StdinReadError};
+use crate::client::messenger::{Chunk, MessengerServer};
 
 pub struct StdinReaderServer {
     current_chunk: Vec<u8>,
@@ -18,7 +18,11 @@ pub struct StdinReaderServer {
 }
 
 impl StdinReaderServer {
-    pub fn new(error_server_addr: Addr<ErrorServer>, messenger_server_addr: Addr<MessengerServer>, sep: Vec<u8>) -> StdinReaderServer {
+    pub fn new(
+        error_server_addr: Addr<ErrorServer>,
+        messenger_server_addr: Addr<MessengerServer>,
+        sep: Vec<u8>,
+    ) -> StdinReaderServer {
         StdinReaderServer {
             current_chunk: vec![],
             current_sep_idx: 0,
@@ -38,7 +42,7 @@ impl StdinReaderServer {
 
             self.buf = [0; 5242880];
 
-            return
+            return;
         }
 
         let last_sep_idx = self.sep.len() - 1;
@@ -68,11 +72,11 @@ impl StdinReaderServer {
                 Err(SendError::Full(Chunk(chunk))) => {
                     self.chunks.push_front(chunk);
                     break;
-                },
+                }
                 Err(SendError::Closed(Chunk(chunk))) => {
                     self.chunks.push_front(chunk);
                     break;
-                },
+                }
                 Ok(()) => (),
             }
         }
@@ -97,10 +101,13 @@ impl Handler<ProcessChunks> for StdinReaderServer {
                     self.parse_chunks(bytes_read);
                 }
                 self.flush_chunks();
-            },
+            }
             Err(error) => {
-                self.error_server_addr.try_send(StdinReadError(error)).unwrap()
-            },
+                // TODO: Find a better way to handle this error.
+                self.error_server_addr
+                    .try_send(StdinReadError(error))
+                    .unwrap()
+            }
         }
     }
 }
