@@ -16,3 +16,6 @@ prost-types = "0"
 simple_logger = "1"
 tokio = { version = "0", features = ["full"] }
 zmq = { version = "0", features = ["vendored"] }
+
+[build-dependencies]
+prost-build = "0"

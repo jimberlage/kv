@@ -1,7 +1,9 @@
-use actix::{Actor, Addr, Context, Handler, Message};
+use actix::{Actor, Addr, Context, Handler};
+use prost::Message;
 use zmq;
 
 use crate::client::errors::{ErrorServer, SocketConnectionError, SocketOpenError, SocketSendError};
+use crate::messages as m;
 
 pub struct MessengerServer {
     ctx: zmq::Context,
@@ -51,28 +53,47 @@ impl Actor for MessengerServer {
     }
 }
 
-pub enum ChunkError {
+pub enum SetAddError {
     Retry,
     Unexpected,
 }
 
-#[derive(Message)]
-#[rtype(result = "Result<(), ChunkError>")]
-pub struct Chunk(pub Vec<u8>);
+#[derive(actix::Message)]
+#[rtype(result = "Result<(), SetAddError>")]
+pub struct SetAdd {
+    pub name: String,
+    pub data: Vec<u8>,
+}
 
-impl Handler<Chunk> for MessengerServer {
-    type Result = Result<(), ChunkError>;
+impl SetAdd {
+    fn encode(self) -> Vec<u8> {
+        let message = m::WireMessage {
+            inner: Some(m::wire_message::Inner::SetAdd(m::SetAdd {
+                name: self.name,
+                data: self.data,
+            })),
+        };
 
-    fn handle(&mut self, Chunk(data): Chunk, _ctx: &mut Context<Self>) -> Self::Result {
-        match self.socket.as_ref().unwrap().send(data, zmq::DONTWAIT) {
-            Err(zmq::Error::EAGAIN) => Err(ChunkError::Retry),
+        let mut buf = vec![];
+        buf.reserve(message.encoded_len());
+        message.encode(&mut buf).unwrap();
+        buf
+    }
+}
+
+impl Handler<SetAdd> for MessengerServer {
+    type Result = Result<(), SetAddError>;
+
+    fn handle(&mut self, set_add: SetAdd, _ctx: &mut Context<Self>) -> Self::Result {
+        match self.socket.as_ref().unwrap().send(set_add.encode(), zmq::DONTWAIT) {
+            Err(zmq::Error::EAGAIN) => Err(SetAddError::Retry),
             Err(error) => {
                 self.error_server_addr.do_send(SocketSendError {
                     error,
                     host: self.host.clone(),
                     port: self.port,
                 });
-                Err(ChunkError::Unexpected)
+                Err(SetAddError::Unexpected)
             }
             _ => Ok(()),
         }

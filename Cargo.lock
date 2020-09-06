@@ -477,6 +477,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fixedbitset"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37ab347416e802de484e4d03c7316c48f1ecb56574dfd4a46a80f173ce1de04d"
+
+[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -775,6 +781,7 @@ dependencies = [
  "clap",
  "log",
  "prost",
+ "prost-build",
  "prost-types",
  "simple_logger",
  "tokio",
@@ -950,6 +957,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "multimap"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1255076139a83bb467426e7f8d0134968a8118844faa755985e077cf31850333"
+
+[[package]]
 name = "net2"
 version = "0.2.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1064,6 +1077,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d4fd5641d01c8f18a23da7b6fe29298ff4b55afcccdf78973b24cf3175fee32e"
 
 [[package]]
+name = "petgraph"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "467d164a6de56270bd7c4d070df81d07beace25012d5103ced4e9ff08d6afdb7"
+dependencies = [
+ "fixedbitset",
+ "indexmap",
+]
+
+[[package]]
 name = "pin-project"
 version = "0.4.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1162,6 +1185,24 @@ checksum = "ce49aefe0a6144a45de32927c77bd2859a5f7677b55f220ae5b744e87389c212"
 dependencies = [
  "bytes",
  "prost-derive",
+]
+
+[[package]]
+name = "prost-build"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "02b10678c913ecbd69350e8535c3aef91a8676c0773fc1d7b95cdd196d7f2f26"
+dependencies = [
+ "bytes",
+ "heck",
+ "itertools",
+ "log",
+ "multimap",
+ "petgraph",
+ "prost",
+ "prost-types",
+ "tempfile",
+ "which",
 ]
 
 [[package]]
@@ -1266,6 +1307,15 @@ name = "regex-syntax"
 version = "0.6.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "26412eb97c6b088a6997e05f69403a802a92d520de2f8e63c2b65f9e0f47c4e8"
+
+[[package]]
+name = "remove_dir_all"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3acd125665422973a33ac9d3dd2df85edad0f4ae9b00dafb1a05e43a9f5ef8e7"
+dependencies = [
+ "winapi 0.3.9",
+]
 
 [[package]]
 name = "resolv-conf"
@@ -1415,6 +1465,20 @@ dependencies = [
  "quote",
  "syn",
  "unicode-xid",
+]
+
+[[package]]
+name = "tempfile"
+version = "3.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a6e24d9338a0a5be79593e2fa15a648add6138caa803e2d5bc782c371732ca9"
+dependencies = [
+ "cfg-if",
+ "libc",
+ "rand",
+ "redox_syscall",
+ "remove_dir_all",
+ "winapi 0.3.9",
 ]
 
 [[package]]
@@ -1661,6 +1725,15 @@ name = "wasi"
 version = "0.9.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cccddf32554fecc6acb585f82a32a72e28b48f8c4c1883ddfeeeaa96f7d8e519"
+
+[[package]]
+name = "which"
+version = "3.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d011071ae14a2f6671d0b74080ae0cd8ebf3a6f8c9589a2cd45f23126fe29724"
+dependencies = [
+ "libc",
+]
 
 [[package]]
 name = "widestring"

@@ -7,6 +7,9 @@ extern crate zmq;
 
 mod client;
 mod server;
+pub mod messages {
+    include!(concat!(env!("OUT_DIR"), "/messages.rs"));
+}
 
 use clap::Clap;
 
@@ -33,8 +36,8 @@ async fn main() {
     let opts = Opts::parse();
 
     match opts.subcommand {
-        Subcommands::Client(_opts) => {
-            unimplemented!();
+        Subcommands::Client(opts) => {
+            client::start(&opts).await;
         }
         Subcommands::Server(opts) => {
             server::start(&opts).await;

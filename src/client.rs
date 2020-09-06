@@ -16,6 +16,8 @@ pub struct Opts {
     host: String,
     #[clap(short, long, default_value = "60054")]
     port: u16,
+    #[clap(short, long)]
+    name: String,
     #[clap(short, long = "separator", default_value = "\n")]
     sep: String,
 }
@@ -29,6 +31,7 @@ pub async fn start(opts: &Opts) {
     let stdin_server = StdinReaderServer::new(
         error_server.clone(),
         messenger_server,
+        opts.name.clone(),
         opts.sep.clone().into_bytes(),
     )
     .start();

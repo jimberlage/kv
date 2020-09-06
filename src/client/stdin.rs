@@ -5,7 +5,7 @@ use actix::prelude::SendError;
 use actix::{Actor, Addr, Context, Handler, Message};
 
 use crate::client::errors::{ErrorServer, StdinReadError};
-use crate::client::messenger::{Chunk, MessengerServer};
+use crate::client::messenger::{MessengerServer, SetAdd};
 
 pub struct StdinReaderServer {
     current_chunk: Vec<u8>,
@@ -14,6 +14,7 @@ pub struct StdinReaderServer {
     chunks: VecDeque<Vec<u8>>,
     error_server_addr: Addr<ErrorServer>,
     messenger_server_addr: Addr<MessengerServer>,
+    name: String,
     sep: Vec<u8>,
 }
 
@@ -21,6 +22,7 @@ impl StdinReaderServer {
     pub fn new(
         error_server_addr: Addr<ErrorServer>,
         messenger_server_addr: Addr<MessengerServer>,
+        name: String,
         sep: Vec<u8>,
     ) -> StdinReaderServer {
         StdinReaderServer {
@@ -30,6 +32,7 @@ impl StdinReaderServer {
             chunks: VecDeque::new(),
             error_server_addr,
             messenger_server_addr,
+            name,
             sep,
         }
     }
@@ -68,13 +71,13 @@ impl StdinReaderServer {
 
     fn flush_chunks(&mut self) {
         while let Some(chunk) = self.chunks.pop_front() {
-            match self.messenger_server_addr.try_send(Chunk(chunk)) {
-                Err(SendError::Full(Chunk(chunk))) => {
-                    self.chunks.push_front(chunk);
+            match self.messenger_server_addr.try_send(SetAdd { name: self.name.clone(), data: chunk }) {
+                Err(SendError::Full(SetAdd { name: _, data })) => {
+                    self.chunks.push_front(data);
                     break;
                 }
-                Err(SendError::Closed(Chunk(chunk))) => {
-                    self.chunks.push_front(chunk);
+                Err(SendError::Closed(SetAdd { name: _, data })) => {
+                    self.chunks.push_front(data);
                     break;
                 }
                 Ok(()) => (),
