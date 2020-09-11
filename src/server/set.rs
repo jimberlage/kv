@@ -21,6 +21,7 @@ impl Actor for SetAgent {
 #[derive(Message)]
 #[rtype(result = "bool")]
 pub struct Insert {
+    pub id: u32,
     pub name: String,
     pub value: Vec<u8>,
 }
@@ -28,7 +29,11 @@ pub struct Insert {
 impl Handler<Insert> for SetAgent {
     type Result = bool;
 
-    fn handle(&mut self, Insert { name, value }: Insert, _ctx: &mut Context<Self>) -> Self::Result {
+    fn handle(
+        &mut self,
+        Insert { id: _, name, value }: Insert,
+        _ctx: &mut Context<Self>,
+    ) -> Self::Result {
         match self.data.get_mut(&name) {
             None => {
                 let mut inner = HashSet::new();

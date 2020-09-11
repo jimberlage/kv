@@ -111,3 +111,28 @@ impl Handler<SocketRecvError> for ErrorServer {
         )
     }
 }
+
+// Represents an inability to send a response to the given client, probably causing a timeout on
+// their end.
+#[derive(Message)]
+#[rtype(result = "()")]
+pub struct UnsentResponseError {
+    pub client_id: u32,
+    pub host: String,
+    pub port: u16,
+}
+
+impl Handler<UnsentResponseError> for ErrorServer {
+    type Result = ();
+
+    fn handle(
+        &mut self,
+        UnsentResponseError { client_id, host, port }: SocketRecvError,
+        _ctx: &mut Context<Self>,
+    ) -> Self::Result {
+        error!(
+            "Could not send data on the ZeroMQ socket on tcp://{}:{} for client {}",
+            host, port, client_id
+        )
+    }
+}

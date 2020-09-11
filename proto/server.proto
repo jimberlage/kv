@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package messages;
+package server.messages;
 
 message SetInsert {
   string name = 1;
@@ -8,7 +8,8 @@ message SetInsert {
 }
 
 message WireMessage {
+  uint32 id = 1;
   oneof inner {
-    SetInsert set_insert = 1;
+    SetInsert set_insert = 2;
   }
 }

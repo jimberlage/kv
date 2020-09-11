@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package client.messages;
+
+message UnrecognizedMessageError {
+}
+
+message WireMessage {
+  uint32 id = 1;
+  oneof inner {
+    UnrecognizedMessageError unrecognized_message_error = 2;
+  }
+}
