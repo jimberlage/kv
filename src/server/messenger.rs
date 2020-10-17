@@ -95,11 +95,11 @@ impl Handler<Error> for MessengerServer {
         match error {
             Error::InvalidMessage { id } => match &self.socket {
                 Some(socket) => {
-                    let buf = vec![];
+                    let mut buf = vec![];
                     cm::WireMessage {
                         id,
-                        inner: cm::wire_message::UnrecognizedMessageError,
-                    }.encode(&buf);
+                        inner: Some(cm::wire_message::Inner::UnrecognizedMessageError(cm::UnrecognizedMessageError{})),
+                    }.encode(&mut buf);
 
                     match socket.send(buf, 0) {
                         // TODO: What should happen here?

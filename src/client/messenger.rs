@@ -3,7 +3,7 @@ use prost::Message;
 use zmq;
 
 use crate::client::errors::{ErrorServer, SocketConnectionError, SocketOpenError, SocketSendError};
-use crate::messages as m;
+use crate::server::messages as m;
 
 pub struct MessengerServer {
     ctx: zmq::Context,
@@ -11,11 +11,13 @@ pub struct MessengerServer {
     port: u16,
     error_server_addr: Addr<ErrorServer>,
     socket: Option<zmq::Socket>,
+    id: Option<u32>,
 }
 
 impl MessengerServer {
     pub fn new(host: &str, port: u16, error_server_addr: Addr<ErrorServer>) -> Self {
         MessengerServer {
+            id: Some(0), // TODO: Need to get an ID somehow.
             ctx: zmq::Context::new(),
             host: host.to_owned(),
             port,
@@ -66,8 +68,9 @@ pub struct SetInsert {
 }
 
 impl SetInsert {
-    fn encode(self) -> Vec<u8> {
+    fn encode(self, id: u32) -> Vec<u8> {
         let message = m::WireMessage {
+            id,
             inner: Some(m::wire_message::Inner::SetInsert(m::SetInsert {
                 name: self.name,
                 value: self.value,
@@ -89,7 +92,7 @@ impl Handler<SetInsert> for MessengerServer {
             .socket
             .as_ref()
             .unwrap()
-            .send(set_add.encode(), zmq::DONTWAIT)
+            .send(set_add.encode(self.id.unwrap()), zmq::DONTWAIT) // TODO: Better checking around IDs.
         {
             Err(zmq::Error::EAGAIN) => Err(SetInsertError::Retry),
             Err(error) => {

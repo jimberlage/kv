@@ -8,6 +8,9 @@ use messenger::MessengerServer;
 use set::SetAgent;
 
 pub mod errors;
+pub mod messages {
+    include!(concat!(env!("OUT_DIR"), "/server.messages.rs"));
+}
 pub mod messenger;
 pub mod set;
 

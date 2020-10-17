@@ -3,6 +3,9 @@ use clap::Clap;
 use tokio::signal::ctrl_c;
 
 pub mod errors;
+pub mod messages {
+    include!(concat!(env!("OUT_DIR"), "/client.messages.rs"));
+}
 pub mod messenger;
 pub mod stdin;
 

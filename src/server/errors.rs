@@ -127,7 +127,7 @@ impl Handler<UnsentResponseError> for ErrorServer {
 
     fn handle(
         &mut self,
-        UnsentResponseError { client_id, host, port }: SocketRecvError,
+        UnsentResponseError { client_id, host, port }: UnsentResponseError,
         _ctx: &mut Context<Self>,
     ) -> Self::Result {
         error!(
